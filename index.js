@@ -4,11 +4,8 @@ const path = require('path');
 const express = require("express")
 const session = require("express-session")
 const cors = require("cors")
-// const helmet = require("helmet");
-// const morgan = require("morgan");
 const authRoutes = require("./api/authRoutes.js")
-// const emailRoutes = require("./api/emailRoute.js")
-// const reactRouts = require("./src/reactRoutes.js")
+const taskRoutes = require("./api/taskRoutes.js")
 dotenv.config()
 
 const port = process.env.PORT || 9000
@@ -21,15 +18,9 @@ app.use(session({ secret: process.env.SECRET,
     resave: false,
     saveUninitialized: true,
     cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 } }));
-// app.use(helmet())
-// app.use(morgan("common"))
 app.set('view engine', 'ejs');
-
-// app.use('/static', express.static(path.join(__dirname, 'public')))
-// app.use("", reactRouts)
 app.use("/api/auth", authRoutes)
-// app.use("/api/v1/email", emailRoutes)
-// app.use("*",(req, res) => res.status(404).json({error:"Not Found"}))
+app.use("/api/task", taskRoutes)
 
 mongoose.connect(process.env.DB_URI,
         {
