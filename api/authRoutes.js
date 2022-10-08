@@ -77,10 +77,14 @@ router.post("/login", async (req,res)=>{
                 res.status(401).statusMessage="Password Did not match"
                 res.send()
             }
-            else{
+            else if(user.isAdmin || user.isActive){
             const {password, __v,...other} = user._doc
             req.session.user = other
             res.status(200).json(other).send()
+            }
+            else{
+                res.status(40).statusMessage="User is not active"
+                res.send()
             }
         }
     }
