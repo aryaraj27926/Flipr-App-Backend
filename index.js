@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const dotenv = require("dotenv")
 const path = require('path');
 const express = require("express")
+const session = require("express-session")
 const cors = require("cors")
 // const helmet = require("helmet");
 // const morgan = require("morgan");
@@ -16,6 +17,10 @@ const app = express()
 
 app.use(cors())
 app.use(express.json())
+app.use(session({ secret: process.env.SECRET,
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 } }));
 // app.use(helmet())
 // app.use(morgan("common"))
 app.set('view engine', 'ejs');
