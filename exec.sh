@@ -6,7 +6,7 @@ id=$(sudo docker images app_backend -q)
 
 sudo docker build --rm -t app_backend .
 
-sudo docker run -dp 3000:3000 --name app_backend_cont app_backend
+sudo docker run -dp 9090:9090 --name app_backend_cont app_backend
 
 new_id=$(sudo docker images app_backend -q)
 
