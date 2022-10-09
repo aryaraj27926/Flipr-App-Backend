@@ -85,8 +85,7 @@ router.post("/login", async (req,res)=>{
             }
         }
     }
-    catch(err){console.error(err);res.status(401)
-        res.send()}
+    catch(err){console.error(err);res.status(500).json({error:"Internal Server Error"}).send()}
 })
 
 module.exports = router
