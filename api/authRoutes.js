@@ -74,7 +74,6 @@ router.post("/login", async (req,res)=>{
             }
             else if(user.isAdmin || user.isActive){
             const {password, __v,...other} = user._doc
-            console.log(process.env.JWT_SECRET);
             const token = jwt.sign(other, process.env.JWT_SECRET, { expiresIn: '12h' });
             const userData = {
                 token: token,
