@@ -9,17 +9,17 @@ router.get("/getemployee", async (req,res)=>{
         return;
     }
     if (!req.session.user) {
-        res.status(400).statusMessage="User not Verified";res.send()
+        res.status(400).json({"error":"User not Verified"}).send()
         return;
     }else if(!req.session.user.isAdmin){
-        res.status(400).statusMessage="User not Admin";res.send()
+        res.status(400).json({"error":"User not Admin"}).send()
         return;
     }
     try {
         const employee = await User.find({isAdmin:false}, {password:0, __v:0})
         res.status(200).json(employee).send()
         }
-    catch(err){console.error(err);res.status(500).statusMessage="Internal Server Error";res.send()}
+    catch(err){console.error(err);res.status(500).json({"error":"Internal Server Error"}).send()}
 })
 
 router.post("/addemployee", async (req,res)=>{
@@ -28,10 +28,10 @@ router.post("/addemployee", async (req,res)=>{
         return;
     }
     if (!req.session.user) {
-        res.status(400).statusMessage="User not Verified";res.send()
+        res.status(400).json({"error":"User not Verified"}).send()
         return;
     }else if(!req.session.user.isAdmin){
-        res.status(400).statusMessage="User not Admin";res.send()
+        res.status(400).json({"error":"User not Admin"}).send()
         return;
     }
     const { name, email, password, contact, department, joiningDate } = req.body;
@@ -39,7 +39,7 @@ router.post("/addemployee", async (req,res)=>{
     try {
         const Emailuser = await User.findOne({email:email})
         if(Emailuser) {
-        res.status(400).statusMessage="Email already exist";res.send()
+        res.status(400).json({"error":"Email already exist"}).send()
         }else{
         const salt = await bcrypt.genSalt(10);
         const hashedPass = await bcrypt.hash(req.body.password, salt)
@@ -57,7 +57,7 @@ router.post("/addemployee", async (req,res)=>{
         res.status(200).json(other).send()
         }
     }
-    catch(err){console.error(err);res.status(500).statusMessage="Internal Server Error";res.send()}
+    catch(err){console.error(err);res.status(500).json({"error":"Internal Server Error"}).send()}
 })
 
 router.post("/login", async (req,res)=>{
@@ -69,12 +69,12 @@ router.post("/login", async (req,res)=>{
     try {
         const user = await User.findOne({email: email});
         if(!user){
-            res.status(400).statusMessage="User Not Found"
+            res.status(400).json({"error":"User Not Found")
             res.send()}
         else{
         const validatePass = await bcrypt.compare(password, user.password)
             if(!validatePass){
-                res.status(401).statusMessage="Password Did not match"
+                res.status(400).json({"error":"Password Did not match")
                 res.send()
             }
             else if(user.isAdmin || user.isActive){
@@ -83,8 +83,7 @@ router.post("/login", async (req,res)=>{
             res.status(200).json(other).send()
             }
             else{
-                res.status(40).statusMessage="User is not active"
-                res.send()
+                res.status(400).json({"error":"User is not active"}).send()
             }
         }
     }
