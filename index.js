@@ -6,12 +6,13 @@ const session = require("express-session")
 const cors = require("cors")
 const authRoutes = require("./api/authRoutes.js")
 const taskRoutes = require("./api/taskRoutes.js")
+const middleware = require("./middleware")
 dotenv.config()
 
 const port = process.env.PORT || 9000
 
 const app = express()
-
+app.use(middleware.run)
 app.use(cors())
 app.use(express.json())
 app.use(session({ secret: process.env.SECRET,

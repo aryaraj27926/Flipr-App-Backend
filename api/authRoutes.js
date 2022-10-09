@@ -2,16 +2,16 @@ const express = require("express")
 const router = express.Router()
 const User = require("../models/user.js")
 const bcrypt = require("bcryptjs")
+const jwt = require("jsonwebtoken")
+const dotenv = require("dotenv")
+dotenv.config()
 
 router.get("/getemployee", async (req,res)=>{
     if(!req.body) {
         res.status(400).json({error: 'BadRequest'}).send();
         return;
     }
-    if (!req.session.user) {
-        res.status(400).json({error:"User not Verified"}).send()
-        return;
-    }else if(!req.session.user.isAdmin){
+    if(!req.user.isAdmin){
         res.status(400).json({error:"User not Admin"}).send()
         return;
     }
@@ -27,10 +27,7 @@ router.post("/addemployee", async (req,res)=>{
         res.status(400).json({error: 'BadRequest'}).send();
         return;
     }
-    if (!req.session.user) {
-        res.status(400).json({error:"User not Verified"}).send()
-        return;
-    }else if(!req.session.user.isAdmin){
+    if(!req.user.isAdmin){
         res.status(400).json({error:"User not Admin"}).send()
         return;
     }
@@ -77,8 +74,13 @@ router.post("/login", async (req,res)=>{
             }
             else if(user.isAdmin || user.isActive){
             const {password, __v,...other} = user._doc
-            req.session.user = other
-            res.status(200).json(other).send()
+            console.log(process.env.JWT_SECRET);
+            const token = jwt.sign(other, process.env.JWT_SECRET, { expiresIn: '12h' });
+            const userData = {
+                token: token,
+                user: other
+              }
+            res.status(200).json(userData).send()
             }
             else{
                 res.status(400).json({error:"User is not active"}).send()

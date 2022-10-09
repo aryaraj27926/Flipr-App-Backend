@@ -7,14 +7,10 @@ router.post("/addtask", async (req,res)=>{
         res.status(400).json({error: 'BadRequest'}).send();
         return;
     }
-    if (!req.session.user) {
-        res.status(400).json({error:"User not Verified"}).send()
-        return;
-    }
     const { description, type, timeTaken, starTime } = req.body;
     try {
         const task = await new Task({
-            userID:req.session.user._id,
+            userID:req.user._id,
             description:description,
             type:type,
             timeTaken:timeTaken,
@@ -32,11 +28,7 @@ router.get("/gettask/:id", async (req,res)=>{
         res.status(400).json({error: 'BadRequest'}).send();
         return;
     }
-    if (!req.session.user) {
-        res.status(400).json({error:"User not Verified"}).send()
-        return;
-    }
-    if (!(req.session.user.isAdmin || req.session.user._id == req.params.id)) {
+    if (!(req.user.isAdmin || req.user._id == req.params.id)) {
         res.status(400).json({error:"Invalid Permission"}).send()
         return;
     }
