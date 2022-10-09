@@ -42,7 +42,7 @@ router.get("/gettask/:id", async (req,res)=>{
     }
     try {
         const task = await Task.find({userID:req.params.id}, {__v:0, _id:0})
-        res.status(200).json(task).send()
+        res.status(200).json({data:task}).send()
         }
     catch(err){console.error(err);res.status(500).json({error:"Internal Server Error"}).send()}
 })

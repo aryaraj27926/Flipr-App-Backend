@@ -17,7 +17,7 @@ router.get("/getemployee", async (req,res)=>{
     }
     try {
         const employee = await User.find({isAdmin:false}, {password:0, __v:0})
-        res.status(200).json(employee).send()
+        res.status(200).json({data:employee}).send()
         }
     catch(err){console.error(err);res.status(500).json({error:"Internal Server Error"}).send()}
 })
