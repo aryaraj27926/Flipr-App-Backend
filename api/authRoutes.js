@@ -69,13 +69,11 @@ router.post("/login", async (req,res)=>{
     try {
         const user = await User.findOne({email: email});
         if(!user){
-            res.status(400).json({"error":"User Not Found")
-            res.send()}
+            res.status(400).json({"error":"User Not Found"}).send()}
         else{
         const validatePass = await bcrypt.compare(password, user.password)
             if(!validatePass){
-                res.status(400).json({"error":"Password Did not match")
-                res.send()
+                res.status(400).json({"error":"Password Did not match"}).send()
             }
             else if(user.isAdmin || user.isActive){
             const {password, __v,...other} = user._doc
