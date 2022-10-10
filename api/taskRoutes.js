@@ -20,7 +20,9 @@ router.post("/addtask", async (req,res)=>{
         const {__v, _id, ...other} = task._doc
         res.status(200).json(other).send()
     }
-    catch(err){console.error(err);res.status(500).json({error:"Internal Server Error"}).send()}
+    catch(err){  
+        if(err.code=="ERR_HTTP_HEADERS_SENT") {console.log(err.code)}else{
+        console.error(err); res.status(500).json({ error: "Internal Server Error" }).send()} }
 })
 
 router.get("/gettask/:id", async (req,res)=>{
@@ -36,7 +38,9 @@ router.get("/gettask/:id", async (req,res)=>{
         const task = await Task.find({userID:req.params.id}, {__v:0, _id:0})
         res.status(200).json({data:task}).send()
         }
-    catch(err){console.error(err);res.status(500).json({error:"Internal Server Error"}).send()}
+    catch(err){  
+        if(err.code=="ERR_HTTP_HEADERS_SENT") {console.log(err.code)}else{
+        console.error(err); res.status(500).json({ error: "Internal Server Error" }).send()} }
 })
 
 module.exports = router

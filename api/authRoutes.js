@@ -6,6 +6,115 @@ const jwt = require("jsonwebtoken")
 const dotenv = require("dotenv")
 dotenv.config()
 
+router.post("/deactivate", async (req,res)=>{
+    if(!req.body) {
+        res.status(400).json({error: 'BadRequest'}).send();
+        return;
+    }
+    if(!req.user.isAdmin){
+        res.status(400).json({error:"User not Admin"}).send()
+        return;
+    }
+    const { id } = req.body;
+    try {
+        const user = await User.findOne({ _id: id })
+        if (!user) {
+            res.status(400).json({ error: "User not Found" }).send()
+        }
+        else {
+            const updatedUser = await User.findByIdAndUpdate(id, { isActive: false }, { new: true })
+                const { password, __v, ...other } = updatedUser._doc
+                res.status(200).json(other).send()
+        }
+    }
+    catch(err) {  
+        if(err.code=="ERR_HTTP_HEADERS_SENT") {console.log(err.code)}else{
+        console.error(err); res.status(500).json({ error: "Internal Server Error" }).send()} }
+})
+
+router.post("/activate", async (req,res)=>{
+    if(!req.body) {
+        res.status(400).json({error: 'BadRequest'}).send();
+        return;
+    }
+    if(!req.user.isAdmin){
+        res.status(400).json({error:"User not Admin"}).send()
+        return;
+    }
+    const { id } = req.body;
+    try {
+        const user = await User.findOne({ _id: id })
+        if (!user) {
+            res.status(400).json({ error: "User not Found" }).send()
+        }
+        else {
+            const updatedUser = await User.findByIdAndUpdate(id, { isActive: true }, { new: true })
+                const { password, __v, ...other } = updatedUser._doc
+                res.status(200).json(other).send()
+        }
+    }
+    catch(err) {  
+        if(err.code=="ERR_HTTP_HEADERS_SENT") {console.log(err.code)}else{
+        console.error(err); res.status(500).json({ error: "Internal Server Error" }).send()} }
+})
+
+
+router.post("/updateprofile", async (req,res)=>{
+    if(!req.body) {
+        res.status(400).json({error: 'BadRequest'}).send();
+        return;
+    }
+    const { name, department, contact } = req.body;
+    if (!name || !department || !contact) {
+        res.status(400).json({ error: 'Please fill all the fields' }).send();
+        return;
+    }
+    try {
+        const user = await User.findOne({ _id: req.user._id })
+        if (!user) {
+            res.status(400).json({ error: "User not Found" }).send()
+        }
+        else {
+                const updatedUser = await User.findByIdAndUpdate(user._id, { name: name, department:department, contact,contact }, { new: true })
+                const { password, __v, ...other } = updatedUser._doc
+                res.status(200).json(other).send()
+        }
+    }
+    catch(err) {  
+        if(err.code=="ERR_HTTP_HEADERS_SENT") {console.log(err.code)}else{
+        console.error(err); res.status(500).json({ error: "Internal Server Error" }).send()} }
+})
+
+router.post("/resetpassword", async (req,res)=>{
+    if(!req.body) {
+        res.status(400).json({error: 'BadRequest'}).send();
+        return;
+    }
+    const { oldPassword, newPassword } = req.body;
+    try {
+        const user = await User.findOne({ _id: req.user._id })
+        if (!user) {
+            res.status(400).json({ error: "User not Found" }).send()
+        }
+        else {
+            const validatePass = await bcrypt.compare(oldPassword, user.password)
+            if(!validatePass){
+                res.status(400).json({error:"Old Password Incorrect"}).send()
+            }else{
+            const salt = await bcrypt.genSalt(10);
+            const hashedPass = await bcrypt.hash(newPassword, salt)
+            const updatedUser = await User.findByIdAndUpdate(user._id, { password: hashedPass }, { new: true })
+            const { password, __v, ...other } = updatedUser._doc
+            res.status(200).json(other).send()
+        }
+        }
+    }
+    catch(err) {  
+        if(err.code=="ERR_HTTP_HEADERS_SENT") {console.log(err.code)}else{
+        console.error(err); res.status(500).json({ error: "Internal Server Error" }).send()} }
+})
+
+
 router.get("/getemployee", async (req,res)=>{
     if(!req.body) {
         res.status(400).json({error: 'BadRequest'}).send();
@@ -19,7 +128,9 @@ router.get("/getemployee", async (req,res)=>{
         const employee = await User.find({isAdmin:false}, {password:0, __v:0})
         res.status(200).json({data:employee}).send()
         }
-    catch(err){console.error(err);res.status(500).json({error:"Internal Server Error"}).send()}
+    catch(err){  
+        if(err.code=="ERR_HTTP_HEADERS_SENT") {console.log(err.code)}else{
+        console.error(err); res.status(500).json({ error: "Internal Server Error" }).send()} } 
 })
 
 router.post("/addemployee", async (req,res)=>{
@@ -54,7 +165,9 @@ router.post("/addemployee", async (req,res)=>{
         res.status(200).json(other).send()
         }
     }
-    catch(err){console.error(err);res.status(500).json({error:"Internal Server Error"}).send()}
+    catch(err) {  
+        if(err.code=="ERR_HTTP_HEADERS_SENT") {console.log(err.code)}else{
+        console.error(err); res.status(500).json({ error: "Internal Server Error" }).send()} }
 })
 
 router.post("/login", async (req,res)=>{
@@ -86,7 +199,9 @@ router.post("/login", async (req,res)=>{
             }
         }
     }
-    catch(err){console.error(err);res.status(500).json({error:"Internal Server Error"}).send()}
+    catch(err) {  
+        if(err.code=="ERR_HTTP_HEADERS_SENT") {console.log(err.code)}else{
+        console.error(err); res.status(500).json({ error: "Internal Server Error" }).send()} }
 })
 
 module.exports = router
